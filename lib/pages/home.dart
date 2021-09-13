@@ -34,8 +34,12 @@ class _HomeState extends State<Home> {
     googleSignIn.signIn();
   }
 
+  logout() {
+    googleSignIn.signOut();
+  }
+
   Widget buildAuthScreen() {
-    return Text('Authencated');
+    return ElevatedButton(onPressed: logout, child: Text('Logout'));
   }
 
   Scaffold buildUnauthScreen() {
@@ -62,7 +66,7 @@ class _HomeState extends State<Home> {
                   color: Colors.white),
             ),
             GestureDetector(
-                onTap: login(),
+                onTap: login,
                 child: Container(
                   width: 260.0,
                   height: 50.0,
