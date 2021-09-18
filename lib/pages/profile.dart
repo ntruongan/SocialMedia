@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/widgets/header.dart';
+import 'package:flutter_application_1/widgets/progress.dart';
 
 class Profile extends StatefulWidget {
   @override
@@ -11,7 +12,7 @@ class _ProfileState extends State<Profile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: header(context, titleText: "Profile"),
-      body: Text("Profile"),
+      body: linearProgress(),
     );
   }
 }
