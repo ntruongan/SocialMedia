@@ -14,7 +14,7 @@ class _TimelineState extends State<Timeline> {
   @override
   void initState() {
     // TODO: implement initState
-    getUser();
+    getUserById();
     super.initState();
   }
 
@@ -24,6 +24,13 @@ class _TimelineState extends State<Timeline> {
         print(doc.data);
       });
     });
+  }
+
+  getUserById() async {
+    final String id = "ShmU2jCV3Hjv7UPdzNkV";
+    DocumentSnapshot doc = await usersRef.document(id).get();
+    print(doc.documentID);
+    print(doc.data);
   }
 
   @override

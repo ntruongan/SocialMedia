@@ -17,7 +17,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   bool isAuth = false;
-  late PageController pageController;
+  PageController pageController;
   int pageIndex = 0;
 
   @override
