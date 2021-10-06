@@ -16,8 +16,54 @@ class _TimelineState extends State<Timeline> {
   @override
   void initState() {
     // TODO: implement initState
-    getUser();
+    // getUser();
+    //createUser();
+    updateUser();
+    deleteUser();
     super.initState();
+  }
+
+  // createUser() async {
+  //   usersRef.add({
+  //     "fullname": "An FE ",
+  //     "isAdmin": false,
+  //     "postcount": 21,
+  //     "username": "am123"
+  //   });
+  // }
+  deleteUser() async {
+    // usersRef.document("fsf12312wsa").delete();
+    final doc = await usersRef.document("fsf1w2312wsa").get();
+    if (doc.exists) {
+      doc.reference.delete();
+    }
+  }
+
+  updateUser() async {
+    final doc = await usersRef.document("fsf1w2312wsa").get();
+    if (doc.exists) {
+      doc.reference.updateData({"fullname": "An FE now"});
+    }
+  }
+
+  createUser() async {
+    // usersRef.document("fsf12312wsa").setData({
+    //   // create with my own id
+    //   "fullname": "An FE ",
+    //   "isAdmin": false,
+    //   "postcount": 21,
+    //   "username": "am123"
+    // });
+    final doc = await usersRef.document("fsf1w2312wsa").get();
+    if (!doc.exists) {
+      usersRef.document("fsf1w2312wsa").setData({
+        // create with my own id
+        "fullname": "An FE 12 ",
+        "isAdmin": false,
+        "postcount": 21,
+        "username": "am123"
+      });
+    }
   }
 
   getUser() async {
@@ -45,8 +91,8 @@ class _TimelineState extends State<Timeline> {
   Widget build(context) {
     return Scaffold(
       appBar: header(context, isAppTitle: true),
-      body: FutureBuilder<QuerySnapshot>(
-          future: usersRef.getDocuments(),
+      body: StreamBuilder<QuerySnapshot>(
+          stream: usersRef.snapshots(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
               return circularProgress();
