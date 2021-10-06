@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/pages/search.dart';
 import 'package:flutter_application_1/widgets/header.dart';
 import 'package:flutter_application_1/widgets/progress.dart';
 
@@ -11,19 +12,26 @@ class Timeline extends StatefulWidget {
 }
 
 class _TimelineState extends State<Timeline> {
+  List<dynamic> users = [];
   @override
   void initState() {
     // TODO: implement initState
-    getUserById();
+    getUser();
     super.initState();
   }
 
-  getUser() {
-    usersRef.getDocuments().then((QuerySnapshot snapshot) {
-      snapshot.documents.forEach((DocumentSnapshot doc) {
-        print(doc.data);
-      });
+  getUser() async {
+    String field = "isAdmin";
+    final QuerySnapshot snapshot =
+        await usersRef.where(field, isEqualTo: true).getDocuments();
+
+    setState(() {
+      users = snapshot.documents;
     });
+    // snapshot.documents.forEach((element) {
+    //   print(element.data);
+    //   print(element.documentID);
+    // });
   }
 
   getUserById() async {
@@ -37,7 +45,19 @@ class _TimelineState extends State<Timeline> {
   Widget build(context) {
     return Scaffold(
       appBar: header(context, isAppTitle: true),
-      body: circularProgress(),
+      body: FutureBuilder<QuerySnapshot>(
+          future: usersRef.getDocuments(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return circularProgress();
+            }
+            final List<Text> children = snapshot.data.documents
+                .map((doc) => Text(doc['fullname']))
+                .toList();
+            return Container(
+              child: ListView(children: children),
+            );
+          }),
     );
   }
 }
