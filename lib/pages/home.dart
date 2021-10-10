@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/pages/activity_feed.dart';
+import 'package:flutter_application_1/pages/create_account.dart';
 import 'package:flutter_application_1/pages/profile.dart';
 import 'package:flutter_application_1/pages/search.dart';
 import 'package:flutter_application_1/pages/timeline.dart';
@@ -9,6 +11,8 @@ import 'package:flutter_application_1/pages/upload.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 final GoogleSignIn googleSignIn = GoogleSignIn();
+final usersRef = Firestore.instance.collection("users");
+final DateTime timestamp = DateTime.now();
 
 class Home extends StatefulWidget {
   @override
@@ -26,16 +30,15 @@ class _HomeState extends State<Home> {
     pageController = PageController();
     // Sign in
     googleSignIn.onCurrentUserChanged.listen((account) {
-      if (account != null) {
-        print('User signed in!: $account');
-        setState(() {
-          isAuth = true;
-        });
-      } else {
-        setState(() {
-          isAuth = false;
-        });
-      }
+      handleSignIn(account);
+    }, onError: (err) {
+      print('Error signing in: $err');
+    });
+    // reauth user when app is opened
+    googleSignIn.signInSilently(suppressErrors: false).then((account) {
+      handleSignIn(account);
+    }).catchError((err) {
+      print('Error signing in: $err');
     });
   }
 
@@ -43,6 +46,20 @@ class _HomeState extends State<Home> {
   void dispose() {
     pageController.dispose();
     super.dispose();
+  }
+
+  handleSignIn(GoogleSignInAccount account) {
+    if (account != null) {
+      createUserInFirestore();
+      print('User signed in!: $account');
+      setState(() {
+        isAuth = true;
+      });
+    } else {
+      setState(() {
+        isAuth = false;
+      });
+    }
   }
 
   login() {
@@ -67,11 +84,32 @@ class _HomeState extends State<Home> {
     });
   }
 
+  createUserInFirestore() async {
+    // 1. check if user exists in users collection in database (based on id)
+    final GoogleSignInAccount user = googleSignIn.currentUser;
+    final DocumentSnapshot doc = await usersRef.document(user.id).get();
+    if (!doc.exists) {
+      // 2. if the user dosnt exists, then we want ot take them to the create account page
+      final username = await Navigator.push(
+          context, MaterialPageRoute(builder: (context) => CreateAccount()));
+      usersRef.document(user.id).setData({
+        "id": user.id,
+        "username": username,
+        "email": user.email,
+        "fullname": user.displayName,
+        "timestamp": timestamp,
+        "photoUrl": user.photoUrl,
+      });
+    }
+    // 3. get username from create account, use it to make new users document in users collection
+  }
+
   Scaffold buildAuthScreen() {
     return Scaffold(
       body: PageView(
         children: <Widget>[
-          Timeline(),
+          //Timeline(),
+          ElevatedButton(onPressed: logout, child: Text('Logout')),
           ActivityFeed(),
           Upload(),
           Search(),
