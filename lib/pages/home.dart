@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/models/user.dart';
 import 'package:flutter_application_1/pages/activity_feed.dart';
 import 'package:flutter_application_1/pages/create_account.dart';
 import 'package:flutter_application_1/pages/profile.dart';
@@ -13,6 +14,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 final GoogleSignIn googleSignIn = GoogleSignIn();
 final usersRef = Firestore.instance.collection("users");
 final DateTime timestamp = DateTime.now();
+User currentUser;
 
 class Home extends StatefulWidget {
   @override
@@ -87,11 +89,13 @@ class _HomeState extends State<Home> {
   createUserInFirestore() async {
     // 1. check if user exists in users collection in database (based on id)
     final GoogleSignInAccount user = googleSignIn.currentUser;
-    final DocumentSnapshot doc = await usersRef.document(user.id).get();
+    DocumentSnapshot doc = await usersRef.document(user.id).get();
     if (!doc.exists) {
       // 2. if the user dosnt exists, then we want ot take them to the create account page
       final username = await Navigator.push(
           context, MaterialPageRoute(builder: (context) => CreateAccount()));
+
+      // 3. get username from create account, use it to make new users document in users collection
       usersRef.document(user.id).setData({
         "id": user.id,
         "username": username,
@@ -100,8 +104,13 @@ class _HomeState extends State<Home> {
         "timestamp": timestamp,
         "photoUrl": user.photoUrl,
       });
+
+      doc = await usersRef.document(user.id).get();
     }
-    // 3. get username from create account, use it to make new users document in users collection
+
+    currentUser = User.fromDocument(doc);
+    print(currentUser);
+    print(currentUser.username);
   }
 
   Scaffold buildAuthScreen() {
