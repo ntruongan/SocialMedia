@@ -27,6 +27,7 @@ class _SearchState extends State<Search> {
   }
 
   Container buildNoContent() {
+    final Orientation orientation = MediaQuery.of(context).orientation;
     return Container(
       child: Center(
         child: ListView(
