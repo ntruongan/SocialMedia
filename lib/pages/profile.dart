@@ -1,9 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/user.dart';
 import 'package:flutter_application_1/pages/edit_profile.dart';
 import 'package:flutter_application_1/pages/home.dart';
 import 'package:flutter_application_1/widgets/header.dart';
+import 'package:flutter_application_1/widgets/post.dart';
 import 'package:flutter_application_1/widgets/progress.dart';
 
 class Profile extends StatefulWidget {
@@ -17,6 +19,33 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   final String currenUserId = currentUser?.id;
+  int postCount = 0;
+  bool isLoading = false;
+  List<Post> posts = [];
+  @override
+  void initState() {
+    super.initState();
+    getProfilePosts();
+  }
+
+  getProfilePosts() async {
+    setState(() {
+      isLoading = true;
+    });
+    QuerySnapshot snapshot = await postsRef
+        .document(widget.profileId)
+        .collection('userPosts')
+        .orderBy('timestamp', descending: true)
+        .getDocuments();
+
+    print(snapshot.toString());
+    setState(() {
+      isLoading = false;
+      postCount = snapshot.documents.length;
+      posts = snapshot.documents.map((doc) => Post.fromDocument(doc)).toList();
+    });
+  }
+
   Column buildCountColumn(String label, int count) {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -89,6 +118,15 @@ class _ProfileState extends State<Profile> {
         function: editProfile,
       );
     }
+  }
+
+  buildProfilePosts() {
+    if (isLoading) {
+      return circularProgress();
+    }
+    return Column(
+      children: posts,
+    );
   }
 
   buildProfileHeader() {
@@ -178,6 +216,10 @@ class _ProfileState extends State<Profile> {
       body: ListView(
         children: <Widget>[
           buildProfileHeader(),
+          Divider(
+            height: 0.0,
+          ),
+          buildProfilePosts(),
         ],
       ),
     );
