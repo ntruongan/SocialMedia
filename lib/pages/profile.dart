@@ -6,6 +6,7 @@ import 'package:flutter_application_1/pages/edit_profile.dart';
 import 'package:flutter_application_1/pages/home.dart';
 import 'package:flutter_application_1/widgets/header.dart';
 import 'package:flutter_application_1/widgets/post.dart';
+import 'package:flutter_application_1/widgets/post_tile.dart';
 import 'package:flutter_application_1/widgets/progress.dart';
 
 class Profile extends StatefulWidget {
@@ -124,9 +125,22 @@ class _ProfileState extends State<Profile> {
     if (isLoading) {
       return circularProgress();
     }
-    return Column(
-      children: posts,
+    List<GridTile> gridTiles = [];
+    posts.forEach((element) {
+      gridTiles.add(GridTile(child: PostTile(element)));
+    });
+    return GridView.count(
+      crossAxisCount: 3,
+      childAspectRatio: 1.0,
+      mainAxisSpacing: 1.5,
+      crossAxisSpacing: 1.5,
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      children: gridTiles,
     );
+    // return Column(
+    //   children: posts,
+    // );
   }
 
   buildProfileHeader() {

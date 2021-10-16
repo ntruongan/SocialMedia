@@ -121,7 +121,7 @@ class _PostState extends State<Post> {
       child: Stack(
         alignment: Alignment.center,
         children: <Widget>[
-          Image.network(mediaUrl),
+          CachedNetworkImage(imageUrl: mediaUrl),
         ],
       ),
     );
