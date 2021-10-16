@@ -13,10 +13,14 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfileState extends State<EditProfile> {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController displayNameController = TextEditingController();
   TextEditingController bioController = TextEditingController();
   bool isLoading = false;
   User user;
+  bool _bioValid = true;
+  bool _fullnameValid = true;
+
   @override
   void initState() {
     super.initState();
@@ -53,6 +57,7 @@ class _EditProfileState extends State<EditProfile> {
           controller: displayNameController,
           decoration: InputDecoration(
             hintText: "Update full name",
+            errorText: _fullnameValid ? null : "Fullname too short",
           ),
         )
       ],
@@ -76,15 +81,43 @@ class _EditProfileState extends State<EditProfile> {
           controller: bioController,
           decoration: InputDecoration(
             hintText: "Update bio",
+            errorText: _bioValid ? null : "Valid too long",
           ),
         )
       ],
     );
   }
 
+  updateProfileData() {
+    setState(() {
+      displayNameController.text.trim().length < 3 ||
+              displayNameController.text.isEmpty
+          ? _fullnameValid = false
+          : _fullnameValid = true;
+
+      bioController.text.trim().length > 100
+          ? _bioValid = false
+          : _bioValid = true;
+    });
+
+    if (_fullnameValid && _bioValid) {
+      usersRef.document(widget.currenUserId).updateData(
+          {"fullname": displayNameController.text, "bio": bioController.text});
+      SnackBar snackBar = SnackBar(content: Text("Profile Updated"));
+      // ignore: deprecated_member_use
+      _scaffoldKey.currentState.showSnackBar(snackBar);
+    }
+  }
+
+  logout() async {
+    await googleSignIn.signOut();
+    Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Text(
@@ -129,7 +162,7 @@ class _EditProfileState extends State<EditProfile> {
                       ),
                       // ignore: deprecated_member_use
                       RaisedButton(
-                        onPressed: () => print('Update profile data'),
+                        onPressed: updateProfileData,
                         child: Text(
                           "Update profile",
                           style: TextStyle(
@@ -143,7 +176,7 @@ class _EditProfileState extends State<EditProfile> {
                         padding: EdgeInsets.all(16),
                         // ignore: deprecated_member_use
                         child: FlatButton.icon(
-                          onPressed: () => print('logout'),
+                          onPressed: logout,
                           icon: Icon(Icons.cancel, color: Colors.red),
                           label: Text(
                             "Logout",
