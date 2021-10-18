@@ -1,10 +1,9 @@
 import 'dart:async';
-
-import 'package:animator/animator.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/user.dart';
+import 'package:flutter_application_1/pages/comments.dart';
 import 'package:flutter_application_1/pages/home.dart';
 import 'package:flutter_application_1/widgets/progress.dart';
 
@@ -163,31 +162,12 @@ class _PostState extends State<Post> {
         children: <Widget>[
           CachedNetworkImage(imageUrl: mediaUrl),
           showHeart
-              ? Animator(
-                  duration: Duration(microseconds: 500),
-                  tween: Tween(
-                    begin: 0.8,
-                    end: 1.4,
-                  ),
-                  curve: Curves.bounceIn,
-                  cycles: 0,
-                  builder: (anim) => Transform.scale(
-                    scale: anim.value,
-                    child: Icon(
-                      Icons.favorite,
-                      size: 80,
-                      color: Colors.red,
-                    ),
-                  ),
+              ? Icon(
+                  Icons.favorite,
+                  size: 80,
+                  color: Colors.red,
                 )
               : Text(""),
-          // showHeart
-          //     ? Icon(
-          //         Icons.favorite,
-          //         size: 80,
-          //         color: Colors.red,
-          //       )
-          //     : Text(""),
         ],
       ),
     );
@@ -210,7 +190,12 @@ class _PostState extends State<Post> {
             ),
             Padding(padding: EdgeInsets.only(right: 20)),
             GestureDetector(
-              onTap: () => print('showng comments'),
+              onTap: () => showComments(
+                context,
+                postId: postId,
+                ownerId: ownerId,
+                mediaUrl: mediaUrl,
+              ),
               child: Icon(
                 Icons.chat,
                 size: 28,
@@ -235,6 +220,23 @@ class _PostState extends State<Post> {
           ],
         ),
       ],
+    );
+  }
+
+  showComments(BuildContext context,
+      {String postId, String ownerId, String mediaUrl}) {
+    print("pressed enter");
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return Comments(
+            postId: postId,
+            postOwnerId: ownerId,
+            postMediaUrl: mediaUrl,
+          );
+        },
+      ),
     );
   }
 
