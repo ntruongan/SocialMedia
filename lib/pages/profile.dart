@@ -8,6 +8,7 @@ import 'package:flutter_application_1/widgets/header.dart';
 import 'package:flutter_application_1/widgets/post.dart';
 import 'package:flutter_application_1/widgets/post_tile.dart';
 import 'package:flutter_application_1/widgets/progress.dart';
+import 'package:flutter_svg/svg.dart';
 
 class Profile extends StatefulWidget {
   final String profileId;
@@ -125,6 +126,8 @@ class _ProfileState extends State<Profile> {
   buildProfilePosts() {
     if (isLoading) {
       return circularProgress();
+    } else if (posts.isEmpty) {
+      buildSplashScreen();
     } else if (postOrientation == "grid") {
       List<GridTile> gridTiles = [];
       posts.forEach((element) {
@@ -144,6 +147,33 @@ class _ProfileState extends State<Profile> {
         children: posts,
       );
     }
+  }
+
+  Container buildSplashScreen() {
+    return Container(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          SvgPicture.asset(
+            'assets/images/no_contennt.svg',
+            height: 260.0,
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 20.0),
+            child: ElevatedButton(
+              child: Text(
+                "No Posts",
+                style: TextStyle(
+                  color: Colors.redAccent,
+                  fontSize: 40.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
   }
 
   buildProfileHeader() {
