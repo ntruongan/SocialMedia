@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/pages/home.dart';
 
 void main() {
-  Firestore.instance.settings(timestampsInSnapshotsEnabled: true).then((value) {
-    print("Timestamps enabled in snapshots\n");
-  }, onError: () {
-    print("Error timestamps enabled in snapshots\n");
-  });
+  // Firestore.instance.settings(timestampsInSnapshotsEnabled: true).then((_) {
+  //   print("Timestamps enabled in snapshots\n");
+  // }, onError: (_) {
+  //   print("Error timestamps enabled in snapshots\n");
+  // });
   runApp(MyApp());
 }
 
